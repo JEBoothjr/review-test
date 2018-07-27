@@ -1,3 +1,4 @@
 {
-  "phabricator.uri" : "http://127.0.0.1"
+  "phabricator.uri" : "http://127.0.0.1",
+  "history.immutable": true
 }
