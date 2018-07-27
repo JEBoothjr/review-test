@@ -1,0 +1,12 @@
+<one-line short summary, no longer than this text>
+
+Summary:
+<longer, detailed summary>
+
+Test Plan:
+
+Reviewers: {project_lead}
+
+Subscribers: {teammates}
+
+Projects: #{project}

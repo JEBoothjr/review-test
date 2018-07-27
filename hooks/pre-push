@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# A pre-push hook that makes it illegal to push to master on the remote.  An exception is made for
+# `arc` which is the preferred workflow.
+#
+# For emergencies, you can override this hook by using either
+#
+#     git push --no-verify [...]
+#
+# OR by prefixing your command with a `NOHOOK=1` environment variable, e.g.:
+#
+#     NOHOOK=1 git push [...]
+
+DIR=$(dirname "${BASH_SOURCE[0]}")
+COMMON_PATH="${DIR}/../bpphab-git-hooks-common"
+if [[ ! -f "$COMMON_PATH" ]]; then
+    echo "ERROR: Missing git-hooks common script at $COMMON_PATH"
+    exit 1
+fi
+source "$COMMON_PATH"
+
+# Remote URLs for which we'll allow pushing to master
+remote_exceptions=(
+    heroku.com
+)
+
+# Each line has the format
+#    <local ref> <sha> <remote ref> <sha>
+# We complain if any remote ref is refs/heads/master
+while read local_ref local_sha remote_ref remote_sha; do
+
+    # Skip exceptions
+    except=0
+    for remote in "${remote_exceptions[@]}"; do
+        if [[ "$2" == *"${remote}"* ]]; then
+            except=1
+            break
+        fi
+    done
+    if [[ $except -eq 1 ]]; then
+        continue
+    fi
+
+    if [[ "${remote_ref}" = "refs/heads/master" ]]; then
+
+        echo "${RED}FATAL ERROR: You cannot push to the master branch manually."
+        echo
+        echo "${BLUE}Instead, you must deploy a feature branch via ${PURP}arc land${BLUE}."
+        echo "    > More info: ${UL}http://git.io/phab-at-bp#faq-2"
+        echo -n ${RST}
+
+        exit 1
+    fi
+done
